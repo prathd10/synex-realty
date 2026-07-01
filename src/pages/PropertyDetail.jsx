@@ -96,7 +96,7 @@ function InquiryForm({ propertyTitle }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <div>
           <label className="text-[10px] uppercase tracking-wider font-bold text-cream/50 block mb-1.5">Full Name *</label>
           <input
@@ -231,11 +231,11 @@ export default function PropertyDetail() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent transition-all" />
               <button onClick={e => { e.stopPropagation(); prevImg(); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/10 hover:bg-accent rounded-full flex items-center justify-center shadow-luxury transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-105 border border-white/15">
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/10 hover:bg-accent rounded-full flex items-center justify-center shadow-luxury transition-all duration-300 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:scale-105 border border-white/15">
                 <ChevronLeft size={20} className="text-white" />
               </button>
               <button onClick={e => { e.stopPropagation(); nextImg(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/10 hover:bg-accent rounded-full flex items-center justify-center shadow-luxury transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-105 border border-white/15">
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/10 hover:bg-accent rounded-full flex items-center justify-center shadow-luxury transition-all duration-300 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 hover:scale-105 border border-white/15">
                 <ChevronRight size={20} className="text-white" />
               </button>
               <div className="absolute bottom-4 right-4 bg-[#110D1A]/80 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-bold px-3.5 py-2 rounded-full flex items-center gap-1.5 shadow-sm border border-white/10">
@@ -255,7 +255,7 @@ export default function PropertyDetail() {
                   <button
                     key={i}
                     onClick={() => setActiveImg(i)}
-                    className={`shrink-0 w-22 h-16 rounded-xl overflow-hidden border-2 transition-all duration-300 shadow-sm ${
+                    className={`shrink-0 w-20 h-16 rounded-xl overflow-hidden border-2 transition-all duration-300 shadow-sm ${
                       activeImg === i ? 'border-accent shadow-luxury' : 'border-transparent opacity-65 hover:opacity-100'
                     }`}
                   >

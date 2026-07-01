@@ -58,14 +58,14 @@ export default function PropertyCard({ property, className = '' }) {
           <>
             <button
               onClick={prevImage}
-              className="absolute top-1/2 -translate-y-1/2 left-3.5 w-7 h-7 rounded-full bg-black/50 hover:bg-black/75 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-105 z-10 border border-white/10"
+              className="absolute top-1/2 -translate-y-1/2 left-3.5 w-7 h-7 rounded-full bg-black/50 hover:bg-black/75 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-105 z-10 border border-white/10"
               aria-label="Previous image"
             >
               <ChevronLeft size={14} className="stroke-[2.5]" />
             </button>
             <button
               onClick={nextImage}
-              className="absolute top-1/2 -translate-y-1/2 right-3.5 w-7 h-7 rounded-full bg-black/50 hover:bg-black/75 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-105 z-10 border border-white/10"
+              className="absolute top-1/2 -translate-y-1/2 right-3.5 w-7 h-7 rounded-full bg-black/50 hover:bg-black/75 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-105 z-10 border border-white/10"
               aria-label="Next image"
             >
               <ChevronRight size={14} className="stroke-[2.5]" />
