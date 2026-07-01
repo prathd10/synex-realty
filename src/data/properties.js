@@ -418,6 +418,7 @@ const rawProperties = [
     ],
     amenities: ['Swimming Pool', 'Gymnasium', 'Spa', '24/7 Security', 'Power Backup', 'Concierge', 'Banquet Hall'],
     highlights: ['Haji Ali Views', 'Sea Facing', 'Central Location', 'Premium Building'],
+  },
   {
     id: 13,
     title: 'Luxury 3 BHK Penthouse for Rent',
