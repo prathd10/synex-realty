@@ -17,6 +17,7 @@ export default function Navbar() {
   useEffect(() => setMenuOpen(false), [pathname]);
 
   const solid = scrolled || !isHome;
+  const logoLeft = isHome && !scrolled;
   const textClass = 'text-white/90';
   const linkHover = 'hover:text-white';
 
@@ -28,7 +29,7 @@ export default function Navbar() {
           : 'bg-transparent py-6'
       }`}
     >
-      <div className="container-wide flex items-center justify-between">
+      <div className="container-wide relative flex items-center justify-between">
         {/* Left Column: Desktop navigation / Empty spacer on mobile */}
         <div className="flex-1 flex justify-start">
           <div className="hidden md:flex items-center gap-6">
@@ -55,17 +56,20 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Center Column: Styled Luxurious Text Logo */}
-        <div className="flex justify-center">
-          <Link to="/" className="flex flex-col items-center group leading-none text-center select-none">
-            <span className="font-serif font-bold text-2xl tracking-[0.2em] text-white transition-colors duration-300 group-hover:text-accent">
-              SYNEX
-            </span>
-            <span className="text-[8px] font-bold tracking-[0.38em] text-accent/95 uppercase -mt-0.5">
-              REALTY
-            </span>
-          </Link>
-        </div>
+        {/* Styled Luxurious Text Logo — sits in the left corner on the hero, animates to center once scrolled */}
+        <Link
+          to="/"
+          className={`absolute top-1/2 -translate-y-1/2 flex flex-col leading-none select-none group z-10 transition-all duration-500 ease-out md:left-1/2 md:-translate-x-1/2 md:items-center md:text-center ${
+            logoLeft ? 'left-0 translate-x-0 items-start text-left' : 'left-1/2 -translate-x-1/2 items-center text-center'
+          }`}
+        >
+          <span className="font-serif font-bold text-2xl tracking-[0.2em] text-white transition-colors duration-300 group-hover:text-accent">
+            SYNEX
+          </span>
+          <span className="text-[8px] font-bold tracking-[0.38em] text-accent/95 uppercase -mt-0.5">
+            REALTY
+          </span>
+        </Link>
 
         {/* Right Column: Desktop CTA & Phone / Mobile Hamburger */}
         <div className="flex-1 flex items-center justify-end gap-6">

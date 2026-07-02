@@ -1,11 +1,36 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Heart, BadgeCheck, TrendingDown, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const SWIPE_THRESHOLD = 40;
 
 export default function PropertyCard({ property, className = '' }) {
   const [liked, setLiked] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const touchStartRef = useRef({ x: 0, y: 0 });
+  const swipedRef = useRef(false);
+  const playTimeoutRef = useRef(null);
+  const videoRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (property.videoUrl) {
+      playTimeoutRef.current = setTimeout(() => {
+        setIsPlayingVideo(true);
+      }, 300);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setIsPlayingVideo(false);
+    if (playTimeoutRef.current) {
+      clearTimeout(playTimeoutRef.current);
+    }
+  };
 
   const handleLike = (e) => {
     e.preventDefault();
@@ -35,23 +60,68 @@ export default function PropertyCard({ property, className = '' }) {
     setCurrentImageIndex(idx);
   };
 
+  const handleTouchStart = (e) => {
+    const t = e.touches[0];
+    touchStartRef.current = { x: t.clientX, y: t.clientY };
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!property.images || property.images.length < 2) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartRef.current.x;
+    const dy = t.clientY - touchStartRef.current.y;
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      swipedRef.current = true;
+      setCurrentImageIndex((prev) =>
+        dx < 0 ? (prev + 1) % property.images.length : (prev - 1 + property.images.length) % property.images.length
+      );
+    }
+  };
+
+  const handleCardClick = (e) => {
+    if (swipedRef.current) {
+      e.preventDefault();
+      swipedRef.current = false;
+    }
+  };
+
   return (
     <Link
       to={`/properties/${property.id}`}
+      onClick={handleCardClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className={`group block glass rounded-3xl overflow-hidden shadow-luxury hover:shadow-luxury-hover border border-white/10 transition-all duration-500 hover:-translate-y-1.5 ${className}`}
     >
       {/* Image Carousel Container */}
-      <div className="relative overflow-hidden aspect-[4/3] bg-[#110D1A]/40">
+      <div
+        className="relative overflow-hidden aspect-square sm:aspect-[4/3] bg-[#110D1A]/40 touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         {!imgLoaded && (
           <div className="absolute inset-0 bg-[#110D1A]/50 animate-pulse" />
         )}
         <img
           src={property.images && property.images.length > 0 ? property.images[currentImageIndex] : ''}
           alt={`${property.title} - Image ${currentImageIndex + 1}`}
-          className={`w-full h-full object-cover group-hover:scale-103 transition-transform duration-700 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`w-full h-full object-cover group-hover:scale-103 transition-transform duration-700 select-none ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setImgLoaded(true)}
           loading="lazy"
+          draggable={false}
         />
+
+        {property.videoUrl && isPlayingVideo && (
+          <video
+            ref={videoRef}
+            src={property.videoUrl}
+            loop
+            muted
+            playsInline
+            autoPlay
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 z-0"
+          />
+        )}
 
         {/* Carousel Arrow Controls */}
         {property.images && property.images.length > 1 && (
@@ -91,6 +161,12 @@ export default function PropertyCard({ property, className = '' }) {
 
         {/* Top-Left Badges */}
         <div className="absolute top-2 left-2 sm:top-3.5 sm:left-3.5 flex flex-col gap-1 sm:gap-1.5 z-10 max-w-[60%]">
+          {property.videoUrl && (
+            <span className="flex items-center gap-1 bg-accent text-white text-[7px] sm:text-[9px] font-bold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full uppercase tracking-wider backdrop-blur-md border border-white/10 shadow-sm truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping shrink-0" />
+              <span className="truncate">Video Tour</span>
+            </span>
+          )}
           {property.isNew && (
             <span className="flex items-center gap-0.5 sm:gap-1 bg-accent/25 text-white text-[7px] sm:text-[9px] font-bold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full uppercase tracking-wider backdrop-blur-md border border-accent/30 shadow-sm truncate">
               <Sparkles size={8} className="text-white shrink-0" /> <span className="truncate">New Launch</span>

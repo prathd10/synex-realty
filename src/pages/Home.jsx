@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Search, MapPin, TrendingUp, Shield, Clock, Star,
   ArrowRight, ChevronRight, Building2, Users, Award, CheckCircle,
+  Play, Pause, Volume2, VolumeX, X, Phone
 } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
+import VideoTourModal from '../components/VideoTourModal';
 import { properties, areas, testimonials } from '../data/properties';
 
 const STATS = [
@@ -54,6 +56,8 @@ export default function Home() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('Buy');
   const [location, setLocation] = useState('');
+  const [activeVideo, setActiveVideo] = useState(null);
+  const [inlinePlayingId, setInlinePlayingId] = useState(null);
 
   const featured = properties.filter(p => p.featured).slice(0, 6);
 
@@ -78,24 +82,24 @@ export default function Home() {
         <div className="absolute inset-x-0 bottom-0 h-48 pointer-events-none"
           style={{ background: 'linear-gradient(to bottom, transparent, #110D1A)' }} />
 
-        <div className="w-full max-w-7xl px-8 md:px-16 lg:px-24 pt-20 relative z-10 text-left text-white select-none">
-          <div className="max-w-xl lg:max-w-2xl flex flex-col gap-6">
-            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium text-white leading-tight">
+        <div className="w-full max-w-7xl px-5 sm:px-8 md:px-16 lg:px-24 pt-24 sm:pt-28 relative z-10 text-left text-white select-none">
+          <div className="max-w-xl lg:max-w-2xl flex flex-col gap-3 sm:gap-6">
+            <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-medium text-white leading-tight">
               Find Your Perfect<br />
               <span className="font-light italic text-accent/90">Mumbai Address</span>
             </h1>
-            <p className="text-white/85 text-base sm:text-lg leading-relaxed max-w-lg mb-2">
+            <p className="text-white/85 text-xs sm:text-lg leading-relaxed w-1/2 sm:max-w-lg mb-1 sm:mb-2">
               From sea facing penthouses in Worli to thriving commercial spaces in BKC. Discover Mumbai's finest properties, curated exclusively for you.
             </p>
 
             {/* Search system */}
             <div className="w-full">
-              <div className="flex gap-2 mb-3 bg-black/35 p-1 rounded-full max-w-xs border border-white/5">
+              <div className="flex gap-1.5 sm:gap-2 mb-2 sm:mb-3 bg-black/35 p-1 rounded-full max-w-[15rem] sm:max-w-xs border border-white/5">
                 {['Buy', 'Rent', 'Commercial'].map(t => (
                   <button
                     key={t}
                     onClick={() => setTab(t)}
-                    className={`flex-1 py-2 rounded-full text-[10px] uppercase tracking-wider font-bold transition-all duration-300 ${
+                    className={`flex-1 py-1.5 sm:py-2 rounded-full text-[8px] sm:text-[10px] uppercase tracking-wider font-bold transition-all duration-300 ${
                       tab === t ? 'bg-accent text-white shadow-luxury' : 'text-white/50 hover:text-white'
                     }`}
                   >
@@ -107,24 +111,24 @@ export default function Home() {
                 onSubmit={handleSearch}
                 className="bg-white/[0.05] backdrop-blur-md rounded-2xl p-1.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 border border-white/10"
               >
-                <div className="flex-1 flex items-center px-4 py-2.5">
-                  <MapPin size={16} className="text-accent mr-3 shrink-0" />
+                <div className="flex-1 flex items-center px-3 sm:px-4 py-2 sm:py-2.5">
+                  <MapPin size={14} className="text-accent mr-2.5 sm:mr-3 shrink-0" />
                   <input
                     value={location}
                     onChange={e => setLocation(e.target.value)}
                     placeholder="Search by area, locality or project…"
-                    className="w-full text-sm text-white font-medium placeholder:text-white/30 outline-none bg-transparent"
+                    className="w-full text-xs sm:text-sm text-white font-medium placeholder:text-white/30 outline-none bg-transparent"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="bg-accent hover:bg-accent-dark text-white font-bold uppercase tracking-wider px-7 py-3 rounded-xl text-[11px] flex items-center justify-center gap-2 transition-all duration-300 shrink-0"
+                  className="bg-accent hover:bg-accent-dark text-white font-bold uppercase tracking-wider px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl text-[10px] sm:text-[11px] flex items-center justify-center gap-2 transition-all duration-300 shrink-0"
                 >
-                  <Search size={13} />
+                  <Search size={12} />
                   Search
                 </button>
               </form>
-              <div className="flex flex-wrap gap-2 mt-4 justify-start">
+              <div className="hidden sm:flex flex-wrap gap-2 mt-4 justify-start">
                 {['Bandra West', 'Worli', 'Lower Parel', 'Powai', 'Juhu'].map(a => (
                   <button
                     key={a}
@@ -189,6 +193,98 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── CINEMATIC VIRTUAL TOURS ─────────────────────── */}
+      <section className="section-padding bg-transparent relative">
+        <div className="container-wide">
+          <div className="text-center mb-12">
+            <p className="text-cream/60 text-xs font-bold uppercase tracking-widest mb-2">Experience Before You Visit</p>
+            <h2 className="font-serif text-3xl md:text-5xl text-white accent-line-center">
+              Cinematic Property Tours
+            </h2>
+            <p className="text-cream/50 mt-4 max-w-xl mx-auto text-sm leading-relaxed">
+              Take high-definition guided virtual walkthroughs of Mumbai's most prestigious and sought-after residential and commercial projects.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+            {properties.filter(p => p.videoUrl).map(p => {
+              const isInlinePlaying = inlinePlayingId === p.id;
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => {
+                    if (!isInlinePlaying) {
+                      setInlinePlayingId(p.id);
+                    }
+                  }}
+                  className="group relative rounded-3xl overflow-hidden aspect-[16/9] cursor-pointer shadow-luxury border border-white/10 bg-black flex items-center justify-center"
+                >
+                  {isInlinePlaying ? (
+                    <>
+                      <video
+                        src={p.videoUrl}
+                        controls
+                        autoPlay
+                        playsInline
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full h-full object-cover z-20"
+                      />
+                      {/* Close button to reset inline playing state */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setInlinePlayingId(null);
+                        }}
+                        className="absolute top-4 right-4 z-30 bg-black/60 hover:bg-black/85 text-white p-1.5 rounded-full border border-white/10 transition-all duration-300 flex items-center justify-center"
+                        title="Close Video"
+                      >
+                        <X size={14} />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Custom Hover Video Preview */}
+                      <HomeVideoPreview property={p} />
+                      
+                      {/* Dark Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#110D1A]/95 via-[#110D1A]/10 to-transparent transition-opacity duration-300 animate-fade-in" />
+                      
+                      {/* Play Button Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-14 h-14 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center group-hover:bg-accent group-hover:scale-110 transition-all duration-500 shadow-float z-10">
+                          <Play size={20} className="text-white fill-white translate-x-0.5 group-hover:scale-105 transition-transform" />
+                        </div>
+                      </div>
+
+                      {/* Video Tour Badge */}
+                      <div className="absolute top-4 left-4 z-10">
+                        <span className="flex items-center gap-1.5 bg-accent/90 text-white text-[9px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider backdrop-blur-md border border-white/10 shadow-sm">
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping shrink-0" />
+                          <span>Watch Walkthrough</span>
+                        </span>
+                      </div>
+
+                      {/* Details Card */}
+                      <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 z-10 flex items-end justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="text-cream/40 text-[9px] uppercase tracking-wider font-bold mb-1">{p.category} · {p.area}</div>
+                          <h3 className="font-serif text-white font-bold text-base sm:text-xl truncate group-hover:text-accent transition-colors duration-300">{p.title}</h3>
+                          <p className="text-cream/50 text-[11px] sm:text-xs truncate mt-0.5">{p.address}</p>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <div className="text-cream/40 text-[8px] uppercase tracking-wider font-bold mb-0.5">Value</div>
+                          <div className="font-serif font-bold text-white text-sm sm:text-lg">{p.priceDisplay}</div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* ── AREA EXPLORER ───────────────────────────────── */}
       <section className="section-padding bg-transparent">
         <div className="container-wide">
@@ -201,12 +297,12 @@ export default function Home() {
               From the glamour of Bandra West to the serene heights of Malabar Hill, every Mumbai neighbourhood tells a unique story.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
             {areas.map(a => (
               <Link
                 key={a.name}
                 to={`/properties?area=${encodeURIComponent(a.name)}`}
-                className="group relative rounded-3xl overflow-hidden aspect-[4/3] cursor-pointer shadow-luxury border border-white/10"
+                className="group relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-square sm:aspect-[4/3] cursor-pointer shadow-luxury border border-white/10"
               >
                 <img
                   src={a.image}
@@ -215,15 +311,55 @@ export default function Home() {
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#110D1A]/95 via-[#110D1A]/20 to-transparent" />
-                <div className="absolute bottom-5 left-5 right-5">
-                  <div className="text-white font-serif font-bold text-xl">{a.name}</div>
-                  <div className="text-cream/50 text-xs mt-1">{a.count} Properties</div>
-                  <div className="text-white text-xs font-bold mt-0.5">{a.priceRange}</div>
+                <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-5">
+                  <div className="text-white font-serif font-bold text-sm sm:text-xl leading-snug">{a.name}</div>
+                  <div className="text-cream/50 text-[10px] sm:text-xs mt-0.5 sm:mt-1">{a.count} Properties</div>
+                  <div className="text-white text-[10px] sm:text-xs font-bold mt-0.5">{a.priceRange}</div>
                 </div>
-                <div className="absolute top-4 right-4 w-8 h-8 bg-white/20 backdrop-blur-md group-hover:bg-accent rounded-full flex items-center justify-center transition-all duration-300 shadow-sm">
-                  <ChevronRight size={15} className="text-white" />
+                <div className="absolute top-2 right-2 sm:top-4 sm:right-4 w-6 h-6 sm:w-8 sm:h-8 bg-white/20 backdrop-blur-md group-hover:bg-accent rounded-full flex items-center justify-center transition-all duration-300 shadow-sm">
+                  <ChevronRight size={13} className="text-white" />
                 </div>
               </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ────────────────────────────────── */}
+      <section className="section-padding bg-transparent overflow-hidden">
+        <div className="container-wide">
+          <div className="text-center mb-12">
+            <p className="text-cream/60 text-xs font-bold uppercase tracking-widest mb-2">Client Stories</p>
+            <h2 className="font-serif text-3xl md:text-5xl text-white accent-line-center">
+              What Our Clients Say
+            </h2>
+          </div>
+        </div>
+        <div className="marquee-fade">
+          <div className="flex w-max gap-4 animate-marquee-left">
+            {[...testimonials, ...testimonials].map((t, idx) => (
+              <div key={`${t.id}-${idx}`} className="w-64 sm:w-72 shrink-0 glass rounded-2xl p-4 sm:p-5 shadow-luxury border border-white/10 flex flex-col justify-between">
+                <div>
+                  <div className="flex gap-1 mb-3">
+                    {Array.from({ length: t.rating }).map((_, i) => (
+                      <Star key={i} size={11} className="text-white fill-accent" />
+                    ))}
+                  </div>
+                  <p className="text-cream/60 text-[11px] leading-relaxed mb-4 italic line-clamp-4">"{t.quote}"</p>
+                </div>
+                <div className="flex items-center gap-2.5 border-t border-white/5 pt-3 mt-auto">
+                  <img
+                    src={t.avatar}
+                    alt={t.name}
+                    className="w-8 h-8 rounded-full object-cover shadow-sm border border-white/10"
+                    loading="lazy"
+                  />
+                  <div>
+                    <div className="font-serif font-bold text-white text-xs">{t.name}</div>
+                    <div className="text-cream/45 text-[9px] tracking-wider uppercase font-bold">{t.role} · {t.location}</div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -294,44 +430,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ────────────────────────────────── */}
-      <section className="section-padding bg-transparent">
-        <div className="container-wide">
-          <div className="text-center mb-16">
-            <p className="text-cream/60 text-xs font-bold uppercase tracking-widest mb-2">Client Stories</p>
-            <h2 className="font-serif text-3xl md:text-5xl text-white accent-line-center">
-              What Our Clients Say
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map(t => (
-              <div key={t.id} className="glass rounded-3xl p-8 shadow-luxury border border-white/10 flex flex-col justify-between">
-                <div>
-                  <div className="flex gap-1 mb-5">
-                    {Array.from({ length: t.rating }).map((_, i) => (
-                      <Star key={i} size={14} className="text-white fill-accent" />
-                    ))}
-                  </div>
-                  <p className="text-cream/60 text-xs leading-relaxed mb-6 italic">"{t.quote}"</p>
-                </div>
-                <div className="flex items-center gap-3 border-t border-white/5 pt-5 mt-auto">
-                  <img
-                    src={t.avatar}
-                    alt={t.name}
-                    className="w-10 h-10 rounded-full object-cover shadow-sm border border-white/10"
-                    loading="lazy"
-                  />
-                  <div>
-                    <div className="font-serif font-bold text-white text-sm">{t.name}</div>
-                    <div className="text-cream/45 text-[10px] tracking-wider uppercase font-bold">{t.role} · {t.location}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── CTA BANNER ──────────────────────────────────── */}
       <section
         className="relative py-24 overflow-hidden border-t border-white/5"
@@ -362,7 +460,65 @@ export default function Home() {
         </div>
       </section>
 
+      {activeVideo && (
+        <VideoTourModal 
+          property={activeVideo} 
+          onClose={() => setActiveVideo(null)} 
+        />
+      )}
+
       </div>
     </div>
   );
 }
+
+// ── CUSTOM VIDEO COMPONENTS FOR LUXURY SHOWCASE ──────────────────
+
+function HomeVideoPreview({ property }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playTimeoutRef = useRef(null);
+  const videoRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (property.videoUrl) {
+      playTimeoutRef.current = setTimeout(() => {
+        setIsPlaying(true);
+      }, 300);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsPlaying(false);
+    if (playTimeoutRef.current) {
+      clearTimeout(playTimeoutRef.current);
+    }
+  };
+
+  return (
+    <div
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="absolute inset-0 w-full h-full"
+    >
+      <img
+        src={property.images[0]}
+        alt={property.title}
+        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 select-none"
+        loading="lazy"
+      />
+      {property.videoUrl && isPlaying && (
+        <video
+          ref={videoRef}
+          src={property.videoUrl}
+          loop
+          muted
+          playsInline
+          autoPlay
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
+      )}
+    </div>
+  );
+}
+
+

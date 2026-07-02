@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { properties } from '../data/properties';
 import PropertyCard from '../components/PropertyCard';
+import VideoTourModal from '../components/VideoTourModal';
 
 function EMICalculator({ price }) {
   const [loan, setLoan] = useState(Math.round(price * 0.8 / 100000) * 100000);
@@ -152,6 +153,7 @@ export default function PropertyDetail() {
   const [lightbox, setLightbox] = useState(false);
   const [liked, setLiked] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [videoOpen, setVideoOpen] = useState(false);
 
   const similar = useMemo(() =>
     properties.filter(p => p.id !== property?.id && (p.area === property?.area || p.bhk === property?.bhk)).slice(0, 3),
@@ -241,11 +243,20 @@ export default function PropertyDetail() {
               <div className="absolute bottom-4 right-4 bg-[#110D1A]/80 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-bold px-3.5 py-2 rounded-full flex items-center gap-1.5 shadow-sm border border-white/10">
                 <Eye size={12} className="text-white" /> {property.images.length} Photos
               </div>
-              {/* Virtual tour button */}
+              {/* Tour button */}
               <div className="absolute bottom-4 left-4">
-                <button className="bg-[#110D1A]/85 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-bold px-4 py-2 rounded-full flex items-center gap-2 hover:bg-accent transition-all shadow-sm border border-white/5 hover:scale-[1.02]">
-                  <Video size={13} className="text-white" /> 360° Virtual Tour
-                </button>
+                {property.videoUrl ? (
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setVideoOpen(true); }}
+                    className="bg-accent hover:bg-accent-dark text-white text-[10px] uppercase tracking-wider font-bold px-4 py-2 rounded-full flex items-center gap-2 transition-all shadow-luxury hover:scale-[1.02]"
+                  >
+                    <Video size={13} className="text-white animate-pulse" /> Watch Video Tour
+                  </button>
+                ) : (
+                  <button className="bg-[#110D1A]/85 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-bold px-4 py-2 rounded-full flex items-center gap-2 hover:bg-accent transition-all shadow-sm border border-white/5 hover:scale-[1.02]">
+                    <Video size={13} className="text-white" /> 360° Virtual Tour
+                  </button>
+                )}
               </div>
             </div>
             {/* Thumbnails */}
@@ -457,6 +468,12 @@ export default function PropertyDetail() {
           </div>
         )}
       </div>
+      {videoOpen && (
+        <VideoTourModal 
+          property={property} 
+          onClose={() => setVideoOpen(false)} 
+        />
+      )}
     </div>
   );
 }

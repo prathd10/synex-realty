@@ -165,6 +165,25 @@ html { scroll-behavior: smooth; }
 .animate-float   { animation: float-y 3s ease-in-out infinite; }
 .animate-sbounce { animation: scroll-bounce 1.5s ease-in-out infinite; }
 
+/* Testimonials marquee (right → left) */
+@keyframes marquee-left {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 26s linear infinite;
+}
+
+.animate-marquee-left:hover {
+  animation-play-state: paused;
+}
+
+.marquee-fade {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
 /* ──────────────────────────────────────────────────
    FORCE BRAND ACCENTS & FONTS (Dev Server Cache Bypass)
    ────────────────────────────────────────────────── */

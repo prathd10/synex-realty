@@ -24,6 +24,7 @@ const rawProperties = [
     isNew: false,
     isPriceDrop: false,
     reraApproved: true,
+    videoUrl: '/sea-face-apartment.mp4',
     images: [
       '/images/penthouse_living.png',
       'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80',
@@ -60,6 +61,7 @@ const rawProperties = [
     isNew: false,
     isPriceDrop: true,
     reraApproved: true,
+    videoUrl: '/luxury-villa.mp4',
     images: [
       '/images/bandra_modern.png',
       'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80',
@@ -165,6 +167,7 @@ const rawProperties = [
     isNew: true,
     isPriceDrop: false,
     reraApproved: true,
+    videoUrl: '/luxury-penthouse.mp4',
     images: [
       '/images/malabar_infinity.png',
       '/images/penthouse_living.png',
@@ -267,10 +270,11 @@ const rawProperties = [
     possession: 'Ready to Move',
     ageYears: 3,
     status: 'Available',
-    featured: false,
+    featured: true,
     isNew: false,
     isPriceDrop: false,
     reraApproved: true,
+    videoUrl: '/commercial-office.mp4',
     images: [
       '/images/bkc_office_lounge.png',
       'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80',
