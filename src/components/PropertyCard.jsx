@@ -58,17 +58,17 @@ export default function PropertyCard({ property, className = '' }) {
           <>
             <button
               onClick={prevImage}
-              className="absolute top-1/2 -translate-y-1/2 left-3.5 w-7 h-7 rounded-full bg-black/50 hover:bg-black/75 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-105 z-10 border border-white/10"
+              className="absolute top-1/2 -translate-y-1/2 left-2 sm:left-3.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-black/50 hover:bg-black/75 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-105 z-10 border border-white/10"
               aria-label="Previous image"
             >
-              <ChevronLeft size={14} className="stroke-[2.5]" />
+              <ChevronLeft size={12} className="stroke-[2.5]" />
             </button>
             <button
               onClick={nextImage}
-              className="absolute top-1/2 -translate-y-1/2 right-3.5 w-7 h-7 rounded-full bg-black/50 hover:bg-black/75 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-105 z-10 border border-white/10"
+              className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-3.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-black/50 hover:bg-black/75 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 hover:scale-105 z-10 border border-white/10"
               aria-label="Next image"
             >
-              <ChevronRight size={14} className="stroke-[2.5]" />
+              <ChevronRight size={12} className="stroke-[2.5]" />
             </button>
           </>
         )}
@@ -90,46 +90,46 @@ export default function PropertyCard({ property, className = '' }) {
         )}
 
         {/* Top-Left Badges */}
-        <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 z-10">
+        <div className="absolute top-2 left-2 sm:top-3.5 sm:left-3.5 flex flex-col gap-1 sm:gap-1.5 z-10 max-w-[60%]">
           {property.isNew && (
-            <span className="flex items-center gap-1 bg-accent/25 text-white text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider backdrop-blur-md border border-accent/30 shadow-sm">
-              <Sparkles size={9} className="text-white" /> New Launch
+            <span className="flex items-center gap-0.5 sm:gap-1 bg-accent/25 text-white text-[7px] sm:text-[9px] font-bold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full uppercase tracking-wider backdrop-blur-md border border-accent/30 shadow-sm truncate">
+              <Sparkles size={8} className="text-white shrink-0" /> <span className="truncate">New Launch</span>
             </span>
           )}
           {property.featured && !property.isNew && (
-            <span className="bg-primary/80 text-cream text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm border border-white/10 backdrop-blur-md">
+            <span className="bg-primary/80 text-cream text-[7px] sm:text-[9px] font-bold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full uppercase tracking-wider shadow-sm border border-white/10 backdrop-blur-md truncate">
               Featured
             </span>
           )}
           {property.isPriceDrop && (
-            <span className="flex items-center gap-1 bg-red-950/40 text-red-300 text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider backdrop-blur-md border border-red-900/30 shadow-sm">
-              <TrendingDown size={9} /> Price Drop
+            <span className="flex items-center gap-0.5 sm:gap-1 bg-red-950/40 text-red-300 text-[7px] sm:text-[9px] font-bold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full uppercase tracking-wider backdrop-blur-md border border-red-900/30 shadow-sm truncate">
+              <TrendingDown size={8} className="shrink-0" /> <span className="truncate">Price Drop</span>
             </span>
           )}
         </div>
 
         {/* Top-Right Controls */}
-        <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5 z-10">
+        <div className="absolute top-2 right-2 sm:top-3.5 sm:right-3.5 flex items-center gap-1 sm:gap-1.5 z-10">
           {property.reraApproved && (
-            <div className="bg-white/15 text-green-300 text-[9px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm backdrop-blur-md border border-white/10">
-              <BadgeCheck size={11} className="text-green-400" /> RERA
+            <div className="bg-white/15 text-green-300 text-[7px] sm:text-[9px] font-bold tracking-wider uppercase px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full flex items-center gap-0.5 sm:gap-1 shadow-sm backdrop-blur-md border border-white/10">
+              <BadgeCheck size={10} className="text-green-400 shrink-0" /> <span className="hidden sm:inline">RERA</span>
             </div>
           )}
           <button
             onClick={handleLike}
-            className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 border border-white/10 ${
+            className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-300 border border-white/10 shrink-0 ${
               liked ? 'bg-red-500 text-white border-transparent shadow-md' : 'bg-black/55 hover:bg-black/70 text-cream/80 hover:text-red-400 hover:scale-105 backdrop-blur-md'
             }`}
             aria-label="Save property"
           >
-            <Heart size={12} fill={liked ? 'currentColor' : 'none'} className="transition-transform duration-300" />
+            <Heart size={10} fill={liked ? 'currentColor' : 'none'} className="transition-transform duration-300" />
           </button>
         </div>
 
         {/* Status Pill */}
-        <div className="absolute bottom-3.5 left-3.5 z-10">
+        <div className="absolute bottom-2 left-2 sm:bottom-3.5 sm:left-3.5 z-10">
           <span
-            className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-md ${
+            className={`text-[7px] sm:text-[9px] font-bold uppercase tracking-wider px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full backdrop-blur-md ${
               property.status === 'Available'
                 ? 'bg-green-950/40 text-green-300 border border-green-900/30 shadow-sm'
                 : 'bg-amber-950/40 text-amber-300 border border-amber-900/30 shadow-sm'
