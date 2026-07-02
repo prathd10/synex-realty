@@ -141,62 +141,62 @@ export default function PropertyCard({ property, className = '' }) {
       </div>
 
       {/* Content */}
-      <div className="p-5 flex flex-col gap-2.5">
+      <div className="p-3 sm:p-5 flex flex-col gap-1.5 sm:gap-2.5">
         {/* Category + Location tag */}
-        <div className="flex items-center justify-between text-[10px] uppercase tracking-wider font-bold text-cream/40">
-          <span>{property.category} · {property.area}</span>
-          <span className="text-[9px] text-accent bg-accent/5 px-2 py-0.5 rounded border border-accent/15">
+        <div className="flex items-center justify-between gap-1.5 text-[9px] sm:text-[10px] uppercase tracking-wider font-bold text-cream/40">
+          <span className="truncate">{property.category} · {property.area}</span>
+          <span className="hidden sm:inline text-[9px] text-accent bg-accent/5 px-2 py-0.5 rounded border border-accent/15 shrink-0">
             {property.type}
           </span>
         </div>
 
         {/* Title */}
-        <h3 className="font-serif text-base font-semibold text-white leading-snug line-clamp-1 group-hover:text-accent transition-colors duration-300">
+        <h3 className="font-serif text-sm sm:text-base font-semibold text-white leading-snug line-clamp-1 group-hover:text-accent transition-colors duration-300">
           {property.title}
         </h3>
 
         {/* Address */}
-        <div className="flex items-center gap-1 text-cream/50 text-xs">
-          <MapPin size={12} className="text-accent shrink-0" />
+        <div className="flex items-center gap-1 text-cream/50 text-[11px] sm:text-xs">
+          <MapPin size={11} className="text-accent shrink-0" />
           <span className="truncate">{property.address}</span>
         </div>
 
         {/* Specifications */}
-        <div className="flex items-center gap-3 text-xs text-cream/60 border-t border-white/5 pt-3.5 mt-1">
+        <div className="flex items-center flex-wrap gap-x-2.5 gap-y-1 sm:gap-3 text-[10px] sm:text-xs text-cream/60 border-t border-white/5 pt-2.5 sm:pt-3.5 mt-1">
           {property.bhk && (
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1 sm:gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-accent/60" />
               {property.bhk} BHK
             </span>
           )}
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-1 sm:gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-accent/60" />
             {property.bathrooms} Bath
           </span>
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-1 sm:gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-accent/60" />
             {property.sqftDisplay}
           </span>
         </div>
 
         {/* Price Section */}
-        <div className="flex items-end justify-between border-t border-white/5 pt-3.5 mt-1">
+        <div className="flex items-end justify-between border-t border-white/5 pt-2.5 sm:pt-3.5 mt-1">
           <div>
-            <div className="text-[9px] text-cream/40 uppercase tracking-widest font-bold mb-0.5">
+            <div className="text-[8px] sm:text-[9px] text-cream/40 uppercase tracking-widest font-bold mb-0.5">
               {property.purpose === 'Rent' ? 'Rent' : 'Price'}
             </div>
-            <div className="font-serif font-bold text-lg text-white tracking-wide">{property.priceDisplay}</div>
+            <div className="font-serif font-bold text-sm sm:text-lg text-white tracking-wide">{property.priceDisplay}</div>
           </div>
           <div className="text-right">
             {property.purpose === 'Rent' ? (
               <>
-                <div className="text-[9px] text-cream/40 uppercase tracking-widest font-bold mb-0.5">Type</div>
-                <div className="text-xs text-accent font-bold uppercase tracking-wider">For Rent</div>
+                <div className="text-[8px] sm:text-[9px] text-cream/40 uppercase tracking-widest font-bold mb-0.5">Type</div>
+                <div className="text-[10px] sm:text-xs text-accent font-bold uppercase tracking-wider">For Rent</div>
               </>
             ) : (
               <>
-                <div className="text-[9px] text-cream/40 uppercase tracking-widest font-bold mb-0.5">Rate</div>
-                <div className="text-xs text-cream/70 font-semibold">{property.pricePerSqft} / sq.ft</div>
+                <div className="text-[8px] sm:text-[9px] text-cream/40 uppercase tracking-widest font-bold mb-0.5">Rate</div>
+                <div className="text-[10px] sm:text-xs text-cream/70 font-semibold">{property.pricePerSqft} / sq.ft</div>
               </>
             )}
           </div>

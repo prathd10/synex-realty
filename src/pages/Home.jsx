@@ -173,7 +173,7 @@ export default function Home() {
               View All <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
             {featured.map(p => (
               <PropertyCard key={p.id} property={p} />
             ))}
