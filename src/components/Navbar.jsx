@@ -56,11 +56,15 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Styled Luxurious Text Logo — sits in the left corner on the hero, animates to center once scrolled */}
+        {/* Styled Luxurious Text Logo — sits aligned with the hero content, slides to center once scrolled.
+            Always anchored at left-0 and moved purely via transform so the motion is one continuous slide
+            instead of animating the "left" property (which caused a visible jump). */}
         <Link
           to="/"
-          className={`absolute top-1/2 -translate-y-1/2 flex flex-col leading-none select-none group z-10 transition-all duration-500 ease-out md:left-1/2 md:-translate-x-1/2 md:items-center md:text-center ${
-            logoLeft ? 'left-0 translate-x-0 items-start text-left' : 'left-1/2 -translate-x-1/2 items-center text-center'
+          className={`absolute left-0 top-1/2 -translate-y-1/2 flex flex-col leading-none select-none group z-10 transition-all duration-500 ease-out md:translate-x-[calc(50vw_-_50%)] md:items-center md:text-center ${
+            logoLeft
+              ? 'translate-x-5 sm:translate-x-8 items-start text-left'
+              : 'translate-x-[calc(50vw_-_50%)] items-center text-center'
           }`}
         >
           <span className="font-serif font-bold text-2xl tracking-[0.2em] text-white transition-colors duration-300 group-hover:text-accent">
