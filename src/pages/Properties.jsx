@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { SlidersHorizontal, Search, X, ChevronDown, MapPin, Grid3X3, List } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
-import { properties } from '../data/properties';
+import { getProperties } from '../lib/queries';
 
 const AREAS = ['All', 'Bandra West', 'Worli', 'Lower Parel', 'Juhu', 'Powai', 'Malabar Hill', 'Andheri West', 'Thane', 'Santacruz', 'Khar West', 'Tardeo', 'BKC'];
 const TYPES = ['All', 'Residential', 'Commercial'];
@@ -19,6 +19,15 @@ export default function Properties() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('newest');
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getProperties()
+      .then(setProperties)
+      .catch(() => setProperties([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   // Open/Close Accordion state
   const [openSections, setOpenSections] = useState({
@@ -50,14 +59,17 @@ export default function Properties() {
     const area = searchParams.get('area') || 'All';
     const type = searchParams.get('type') || 'All';
     const purpose = searchParams.get('purpose') || 'All';
+    const bhk = searchParams.get('bhk') || 'Any';
+    const maxPriceParam = searchParams.get('maxPrice');
     const searchVal = searchParams.get('search') || '';
-    
+
     setFilters(f => ({
       ...f,
       area,
       type,
       purpose,
-      maxPrice: purpose === 'Rent' ? 1000000 : 200000000
+      bhk,
+      maxPrice: maxPriceParam ? parseInt(maxPriceParam, 10) : (purpose === 'Rent' ? 1000000 : 200000000)
     }));
     if (searchVal) setSearch(searchVal);
   }, [searchParams]);
@@ -129,7 +141,7 @@ export default function Properties() {
     else if (sort === 'area-asc') list.sort((a, b) => a.sqft - b.sqft);
 
     return list;
-  }, [filters, search, sort]);
+  }, [filters, search, sort, properties]);
 
   const clearFilters = () => {
     setFilters({
@@ -544,7 +556,11 @@ export default function Properties() {
 
           {/* Grid */}
           <div className="flex-1 min-w-0">
-            {filtered.length === 0 ? (
+            {loading ? (
+              <div className="glass rounded-3xl p-12 text-center border border-white/10 shadow-luxury text-cream/50 text-sm">
+                Loading properties…
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="glass rounded-3xl p-12 text-center border border-white/10 shadow-luxury">
                 <MapPin size={40} className="text-white/30 mx-auto mb-4" />
                 <h3 className="font-serif text-2xl font-bold text-white mb-2">No properties match</h3>

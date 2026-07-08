@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   MapPin, BedDouble, Bath, Maximize2, Car, Building2,
@@ -6,7 +6,7 @@ import {
   ChevronRight, X, CheckCircle, Calculator, ArrowRight,
   Eye, Video, Phone,
 } from 'lucide-react';
-import { properties } from '../data/properties';
+import { getProperty, getSimilarProperties, createLead } from '../lib/queries';
 import PropertyCard from '../components/PropertyCard';
 import VideoTourModal from '../components/VideoTourModal';
 
@@ -66,15 +66,33 @@ function EMICalculator({ price }) {
   );
 }
 
-function InquiryForm({ propertyTitle }) {
+function InquiryForm({ propertyId }) {
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError('');
+    try {
+      await createLead({
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        source: 'property_inquiry',
+        propertyId,
+        details: { message: form.message },
+      });
+      setSubmitted(true);
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -132,11 +150,14 @@ function InquiryForm({ propertyTitle }) {
           className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs text-white font-medium focus:outline-none focus:border-accent bg-white/[0.03] placeholder:text-cream/20 transition-all duration-300 resize-none"
         />
       </div>
+      {error && <p className="text-xs text-red-400">{error}</p>}
+
       <button
         type="submit"
-        className="w-full bg-accent hover:bg-accent-dark text-white font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all duration-300 text-xs shadow-luxury hover:shadow-luxury-hover hover:-translate-y-0.5"
+        disabled={submitting}
+        className="w-full bg-accent hover:bg-accent-dark text-white font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all duration-300 text-xs shadow-luxury hover:shadow-luxury-hover hover:-translate-y-0.5 disabled:opacity-60"
       >
-        Request Details
+        {submitting ? 'Sending…' : 'Request Details'}
       </button>
       <p className="text-[9px] text-cream/35 text-center leading-relaxed">
         Your contact details are shared only with our consultant. We fully respect your confidentiality.
@@ -145,9 +166,78 @@ function InquiryForm({ propertyTitle }) {
   );
 }
 
+function ScheduleVisitModal({ propertyId, onClose }) {
+  const [form, setForm] = useState({ name: '', phone: '', date: '', slot: 'Morning (10 AM – 1 PM)' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+    try {
+      await createLead({
+        name: form.name,
+        phone: form.phone,
+        source: 'schedule_visit',
+        propertyId,
+        details: { preferredDate: form.date, timeSlot: form.slot },
+      });
+      setSubmitted(true);
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-[#110D1A]/95 rounded-3xl p-6 w-full max-w-sm shadow-float border border-white/10 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5 border-b border-white/5 pb-3">
+          <h3 className="font-serif font-bold text-white text-lg">Schedule Site Visit</h3>
+          <button onClick={onClose} className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5"><X size={15} className="text-cream" /></button>
+        </div>
+        {submitted ? (
+          <div className="text-center py-6">
+            <CheckCircle size={32} className="text-white mx-auto mb-3" />
+            <p className="text-cream/60 text-xs leading-relaxed">
+              Visit request received. Our team will confirm your slot within 24 hours.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            <input required type="text" placeholder="Your Name" value={form.name} onChange={(e) => set('name', e.target.value)} className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent bg-white/[0.03] placeholder:text-cream/20" />
+            <input required type="tel" placeholder="Phone Number" value={form.phone} onChange={(e) => set('phone', e.target.value)} className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent bg-white/[0.03] placeholder:text-cream/20" />
+            <input required type="date" value={form.date} onChange={(e) => set('date', e.target.value)} className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs text-cream focus:outline-none focus:border-accent bg-white/[0.03]" />
+            <select value={form.slot} onChange={(e) => set('slot', e.target.value)} className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-accent text-white bg-[#110D1A] font-bold cursor-pointer">
+              <option className="bg-[#110D1A]">Morning (10 AM – 1 PM)</option>
+              <option className="bg-[#110D1A]">Afternoon (1 PM – 4 PM)</option>
+              <option className="bg-[#110D1A]">Evening (4 PM – 7 PM)</option>
+            </select>
+            {error && <p className="text-xs text-red-400">{error}</p>}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-accent hover:bg-accent-dark text-white font-bold uppercase tracking-wider py-3.5 rounded-xl text-xs transition-all duration-300 shadow-luxury disabled:opacity-60"
+            >
+              {submitting ? 'Booking…' : 'Confirm Booking'}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function PropertyDetail() {
   const { id } = useParams();
-  const property = properties.find(p => p.id === parseInt(id));
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [similar, setSimilar] = useState([]);
 
   const [activeImg, setActiveImg] = useState(0);
   const [lightbox, setLightbox] = useState(false);
@@ -155,10 +245,20 @@ export default function PropertyDetail() {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(false);
 
-  const similar = useMemo(() =>
-    properties.filter(p => p.id !== property?.id && (p.area === property?.area || p.bhk === property?.bhk)).slice(0, 3),
-    [property]
-  );
+  useEffect(() => {
+    setLoading(true);
+    getProperty(id)
+      .then((p) => {
+        setProperty(p);
+        setActiveImg(0);
+        if (p) return getSimilarProperties(p, 3).then(setSimilar);
+      })
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return <div className="pt-32 text-center bg-transparent min-h-screen text-cream/50 text-sm">Loading…</div>;
+  }
 
   if (!property) {
     return (
@@ -416,35 +516,12 @@ export default function PropertyDetail() {
               <div className="glass rounded-3xl p-6 shadow-luxury border border-white/10">
                 <h3 className="font-serif font-bold text-white text-lg mb-1">Request Private Details</h3>
                 <p className="text-cream/50 text-[10px] uppercase tracking-wider font-bold mb-4">Our advisor will reach you within 24 hours.</p>
-                <InquiryForm propertyTitle={property.title} />
+                <InquiryForm propertyId={property.id} />
               </div>
 
-              {/* Schedule visit modal-like */}
+              {/* Schedule visit modal */}
               {scheduleOpen && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setScheduleOpen(false)}>
-                  <div className="bg-[#110D1A]/95 rounded-3xl p-6 w-full max-w-sm shadow-float border border-white/10 animate-scale-in" onClick={e => e.stopPropagation()}>
-                    <div className="flex items-center justify-between mb-5 border-b border-white/5 pb-3">
-                      <h3 className="font-serif font-bold text-white text-lg">Schedule Site Visit</h3>
-                      <button onClick={() => setScheduleOpen(false)} className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5"><X size={15} className="text-cream" /></button>
-                    </div>
-                    <div className="space-y-3.5">
-                      <input type="text" placeholder="Your Name" className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent bg-white/[0.03] placeholder:text-cream/20" />
-                      <input type="tel" placeholder="Phone Number" className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-accent bg-white/[0.03] placeholder:text-cream/20" />
-                      <input type="date" className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs text-cream focus:outline-none focus:border-accent bg-white/[0.03]" />
-                      <select className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-accent text-white bg-[#110D1A] font-bold cursor-pointer">
-                        <option className="bg-[#110D1A]">Morning (10 AM – 1 PM)</option>
-                        <option className="bg-[#110D1A]">Afternoon (1 PM – 4 PM)</option>
-                        <option className="bg-[#110D1A]">Evening (4 PM – 7 PM)</option>
-                      </select>
-                      <button
-                        onClick={() => setScheduleOpen(false)}
-                        className="w-full bg-accent hover:bg-accent-dark text-white font-bold uppercase tracking-wider py-3.5 rounded-xl text-xs transition-all duration-300 shadow-luxury"
-                      >
-                        Confirm Booking
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <ScheduleVisitModal propertyId={property.id} onClose={() => setScheduleOpen(false)} />
               )}
             </div>
           </aside>

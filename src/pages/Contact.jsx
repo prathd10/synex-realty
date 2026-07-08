@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, CheckCircle, Send } from 'lucide-react';
+import { createLead } from '../lib/queries';
 
 const SOCIAL = [
   { label: 'IG' },
@@ -22,11 +23,28 @@ const FAQS = [
 export default function Contact() {
   const [form, setForm] = useState({ name: '', phone: '', email: '', type: 'Buying', budget: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError('');
+    try {
+      await createLead({
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        source: 'contact_page',
+        details: { type: form.type, budget: form.budget, message: form.message },
+      });
+      setSubmitted(true);
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -130,11 +148,13 @@ export default function Contact() {
                       className="w-full border border-white/10 rounded-xl px-4 py-3 text-xs text-white font-medium focus:outline-none focus:border-accent bg-white/[0.03] placeholder:text-cream/20 transition-all duration-300 resize-none"
                     />
                   </div>
+                  {error && <p className="text-xs text-red-400">{error}</p>}
                   <button
                     type="submit"
-                    className="w-full bg-accent hover:bg-accent-dark text-white font-bold uppercase tracking-wider py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-xs shadow-luxury hover:shadow-luxury-hover hover:-translate-y-0.5"
+                    disabled={submitting}
+                    className="w-full bg-accent hover:bg-accent-dark text-white font-bold uppercase tracking-wider py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-xs shadow-luxury hover:shadow-luxury-hover hover:-translate-y-0.5 disabled:opacity-60"
                   >
-                    <Send size={14} /> Send Message
+                    <Send size={14} /> {submitting ? 'Sending…' : 'Send Message'}
                   </button>
                   <p className="text-[10px] text-cream/35 text-center leading-relaxed">
                     Your details are completely secure and will never be shared with third parties.

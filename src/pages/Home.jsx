@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Search, MapPin, TrendingUp, Shield, Clock, Star,
@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import VideoTourModal from '../components/VideoTourModal';
-import { properties, areas, testimonials } from '../data/properties';
+import { areas } from '../data/properties';
+import { getFeaturedProperties, getTestimonials, getProperties } from '../lib/queries';
 
 const STATS = [
   { value: '500+', label: 'Properties Listed', icon: Building2 },
@@ -58,8 +59,15 @@ export default function Home() {
   const [location, setLocation] = useState('');
   const [activeVideo, setActiveVideo] = useState(null);
   const [inlinePlayingId, setInlinePlayingId] = useState(null);
+  const [featured, setFeatured] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [properties, setProperties] = useState([]);
 
-  const featured = properties.filter(p => p.featured).slice(0, 6);
+  useEffect(() => {
+    getFeaturedProperties(6).then(setFeatured).catch(() => setFeatured([]));
+    getTestimonials().then(setTestimonials).catch(() => setTestimonials([]));
+    getProperties().then(setProperties).catch(() => setProperties([]));
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
