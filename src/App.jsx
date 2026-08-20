@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -9,6 +9,7 @@ import PropertyDetail from './pages/PropertyDetail';
 import Contact from './pages/Contact';
 import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
+import AdminDealRoom from './pages/admin/DealRoom';
 import AdminProperties from './pages/admin/Properties';
 import PropertyForm from './pages/admin/PropertyForm';
 import AdminTestimonials from './pages/admin/Testimonials';
@@ -57,6 +58,7 @@ function PublicSite() {
           <Route path="/properties" element={<Properties />} />
           <Route path="/properties/:id" element={<PropertyDetail />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       <Footer />
@@ -78,14 +80,18 @@ export default function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<ProtectedRoute />}>
             <Route element={<AdminLayout />}>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="deals" element={<AdminDealRoom />} />
               <Route path="properties" element={<AdminProperties />} />
               <Route path="properties/new" element={<PropertyForm />} />
               <Route path="properties/:id/edit" element={<PropertyForm />} />
               <Route path="testimonials" element={<AdminTestimonials />} />
               <Route path="leads" element={<AdminLeads />} />
+              <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
             </Route>
           </Route>
+          <Route path="*" element={<Navigate to="/admin/login" replace />} />
         </Routes>
       ) : (
         <PublicSite />
